@@ -9,16 +9,3 @@ Powering up server
 I use PHP's built-in server:
 
     ./serve.sh
-
-NOT FOR PRODUCTION
-------------------
-
-Unfortunately, each request is blazingly slow because the server
-is required to request each news one by one, thus being
-expensive and slow.
-
-One solution to this problem is to pre-build pages but it will
-not gonna be efficient since the server has to check if there is
-any new news (checking 3 minutes each).
-
-Still, too much of a hassle.
