@@ -6,8 +6,9 @@ An alternative front-end for Hacker News.
 NOT FOR PRODUCTION
 ------------------
 
-This project is slow because it requires to request for each
-news, thus being expensive.
+Unfortunately, each request is blazingly slow because the server
+is required to request each news one by one, thus being
+expensive and slow.
 
 One solution to this problem is to pre-build pages but it will
 not gonna be efficient since the server has to check if there is
