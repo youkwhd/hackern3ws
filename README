@@ -3,6 +3,13 @@ hackern3ws
 
 An alternative front-end for Hacker News.
 
+Powering up server
+------------------
+
+I use PHP's built-in server:
+
+    ./serve.sh
+
 NOT FOR PRODUCTION
 ------------------
 
