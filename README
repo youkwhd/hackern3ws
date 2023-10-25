@@ -1,0 +1,16 @@
+hackern3ws
+==========
+
+An alternative front-end for Hacker News.
+
+NOT FOR PRODUCTION
+------------------
+
+This project is slow because it requires to request for each
+news, thus being expensive.
+
+One solution to this problem is to pre-build pages but it will
+not gonna be efficient since the server has to check if there is
+any new news (checking 3 minutes each).
+
+Still, too much of a hassle.
