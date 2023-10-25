@@ -1,4 +1,6 @@
 <?php
+    require_once "../css.php";
+    require_once "../cache.php";
     require_once "../cookie.php";
 
     $curl = curl_init();
@@ -18,6 +20,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <?php require_css("_static/css/news.css") ?>
     <title>Hacker N3ws</title>
 </head>
 <body>
@@ -27,13 +30,35 @@
     <?php for ($i = $from; $i < count($top_stories) && $i < $to; $i++) : ?>
         <?php
             curl_setopt($curl, CURLOPT_URL, "https://hacker-news.firebaseio.com/v0/item/$top_stories[$i].json");
-            $story = json_decode(curl_exec($curl));
+
+            if (isset($_SESSION["cache"][$top_stories[$i]])) {
+                $story = $_SESSION["cache"][$top_stories[$i]];
+            } else {
+                $story = json_decode(curl_exec($curl));
+                $_SESSION["cache"][$top_stories[$i]] = $story;
+            }
         ?>
-        <div>
-            <span>
+        <div class="hn--news-containter">
+            <span class="hn--news-title">
                 <?= $story->{"title"} ?>
             </span>
         </div>
     <?php endfor ?>
+    <footer class="hn--footer-root">
+        <div class="hn--footer-left">
+        </div>
+        <div class="hn--footer-right">
+            <?php
+                $prev = $page - 1;
+                $next = $page + 1;
+
+                if ($prev <= 0) {
+                    $prev = 1;
+                }
+            ?>
+            <a href="/?p=<?= $prev ?>">Prev</a>
+            <a href="/?p=<?= $next ?>">Next</a>
+        </div>
+    </footer>
 </body>
 </html>
