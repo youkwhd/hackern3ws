@@ -2,3 +2,20 @@ html, body {
     background-color: black;
     color: white;
 }
+
+body {
+    max-width: 720px;
+    margin: 10px auto;
+}
+
+h1 {
+    font-size: 25px;
+}
+
+h2 {
+    font-size: 22px;
+}
+
+.hn--news-title {
+    /* font-size: 14px; */
+}

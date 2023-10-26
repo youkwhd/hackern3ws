@@ -1,9 +1,10 @@
 <?php
     require_once "../css.php";
+    require_once "../path.php";
     require_once "../cache.php";
     require_once "../cookie.php";
     require_once "../../config.php";
-
+    
     if (isset($_CONFIG["USE_MEMCACHED"]) && $_CONFIG["USE_MEMCACHED"]) {
         $memcached = new Memcached;
         $memcached->addServer("127.0.0.1", 11211);
@@ -26,31 +27,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <?php require_css("_static/css/news.css") ?>
+    <?php require_css("/_static/css/news.css") ?>
     <title>Hacker N3ws</title>
 </head>
 <body>
-    <h1>
-        Hacker N3ws
-    </h1>
+    <header>
+        <h1>
+            hackern3ws
+        </h1>
+    </header>
     <?php for ($i = $from; $i < count($top_stories) && $i < $to; $i++) : ?>
         <?php
-            if ((isset($_CONFIG["USE_MEMCACHED"]) && $_CONFIG["USE_MEMCACHED"]) && $memcached->get($top_stories[$i])) {
-                $story = $memcached->get($top_stories[$i]);
+            if ((isset($_CONFIG["USE_MEMCACHED"]) && $_CONFIG["USE_MEMCACHED"]) && $memcached->get("news-$top_stories[$i]")) {
+                $story = $memcached->get("news-$top_stories[$i]");
             } else {
                 curl_setopt($curl, CURLOPT_URL, "https://hacker-news.firebaseio.com/v0/item/$top_stories[$i].json");
                 $story = json_decode(curl_exec($curl));
 
                 if (isset($_CONFIG["USE_MEMCACHED"]) && $_CONFIG["USE_MEMCACHED"]) {
-                    $memcached->set($top_stories[$i], $story);
+                    $memcached->set("news-$top_stories[$i]", $story);
                 }
-
-                echo "CACHED";
             }
         ?>
         <div class="hn--news-containter">
             <span class="hn--news-title">
-                <?= $story->{"title"} ?>
+                <a target="_blank" href="<?= $story->{"url"} ?>">
+                    <?= $story->{"title"} ?>
+                </a>
+            </span>
+            <br />
+            <span class="hn--news-comments">
+                <a href="/comments?id=<?= $story->{"id"} ?>">
+                    Comments
+                </a>
             </span>
         </div>
     <?php endfor ?>
