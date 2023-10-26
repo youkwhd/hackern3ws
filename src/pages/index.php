@@ -1,7 +1,6 @@
 <?php
     require_once "../css.php";
     require_once "../path.php";
-    require_once "../cache.php";
     require_once "../cookie.php";
     require_once "../../config.php";
     
