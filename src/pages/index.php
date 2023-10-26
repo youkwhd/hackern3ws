@@ -2,6 +2,12 @@
     require_once "../css.php";
     require_once "../cache.php";
     require_once "../cookie.php";
+    require_once "../../config.php";
+
+    if (isset($_CONFIG["USE_MEMCACHED"]) && $_CONFIG["USE_MEMCACHED"]) {
+        $memcached = new Memcached;
+        $memcached->addServer("127.0.0.1", 11211);
+    }
 
     $curl = curl_init();
     curl_setopt($curl, CURLOPT_URL, "https://hacker-news.firebaseio.com/v0/topstories.json");
@@ -29,13 +35,17 @@
     </h1>
     <?php for ($i = $from; $i < count($top_stories) && $i < $to; $i++) : ?>
         <?php
-            curl_setopt($curl, CURLOPT_URL, "https://hacker-news.firebaseio.com/v0/item/$top_stories[$i].json");
-
-            if (isset($_SESSION["cache"][$top_stories[$i]])) {
-                $story = $_SESSION["cache"][$top_stories[$i]];
+            if ((isset($_CONFIG["USE_MEMCACHED"]) && $_CONFIG["USE_MEMCACHED"]) && $memcached->get($top_stories[$i])) {
+                $story = $memcached->get($top_stories[$i]);
             } else {
+                curl_setopt($curl, CURLOPT_URL, "https://hacker-news.firebaseio.com/v0/item/$top_stories[$i].json");
                 $story = json_decode(curl_exec($curl));
-                $_SESSION["cache"][$top_stories[$i]] = $story;
+
+                if (isset($_CONFIG["USE_MEMCACHED"]) && $_CONFIG["USE_MEMCACHED"]) {
+                    $memcached->set($top_stories[$i], $story);
+                }
+
+                echo "CACHED";
             }
         ?>
         <div class="hn--news-containter">
