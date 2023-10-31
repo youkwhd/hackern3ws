@@ -8,6 +8,19 @@ body {
     margin: 10px auto;
 }
 
+.hn--footer-root {
+    padding: 2px 0px;
+    margin: 6px 0px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.hn--footer-root a {
+    color: white;
+    text-decoration: none;
+}
+
 h1 {
     font-size: 25px;
 }
@@ -18,4 +31,8 @@ h2 {
 
 .hn--news-title {
     /* font-size: 14px; */
+}
+
+.hn--container {
+    margin: 10px 0px;
 }

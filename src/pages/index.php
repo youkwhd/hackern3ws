@@ -11,11 +11,17 @@
 
     $curl = curl_init();
     curl_setopt($curl, CURLOPT_URL, "https://hacker-news.firebaseio.com/v0/topstories.json");
+    // REMOVE
+    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+    // REMOVE
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 
-    $page = isset($_GET["p"]) && $_GET["p"] > 0 ? $_GET["p"] : 1;
-    $top_stories = json_decode(curl_exec($curl));
+    $top_stories = json_decode(curl_exec($curl)) ?: [];
 
+    curl_setopt($curl, CURLOPT_URL, "https://hacker-news.firebaseio.com/v0/jobstories.json");
+    $jobs = json_decode(curl_exec($curl)) ?: [];
+
+    $page = isset($_GET["p"]) && $_GET["p"] > 0 ? $_GET["p"] : 1;
     $to = $_COOKIE["NEWS_PER_PAGE"] * $page;
     $from = $to - $_COOKIE["NEWS_PER_PAGE"];
 ?>
@@ -35,6 +41,39 @@
             hackern3ws
         </h1>
     </header>
+    <p>Latest Jobs</p>
+    <?php for ($i = 0; $i < 3; $i++) : ?>
+        <?php
+            if ((isset($_CONFIG["USE_MEMCACHED"]) && $_CONFIG["USE_MEMCACHED"]) && $memcached->get("jobs-$jobs[$i]")) {
+                $job = $memcached->get("jobs-$jobs[$i]");
+            } else {
+                curl_setopt($curl, CURLOPT_URL, "https://hacker-news.firebaseio.com/v0/item/$jobs[$i].json");
+                $job = json_decode(curl_exec($curl));
+
+                if (isset($_CONFIG["USE_MEMCACHED"]) && $_CONFIG["USE_MEMCACHED"]) {
+                    $memcached->set("jobs-$jobs[$i]", $job);
+                }
+            }
+        ?>
+        <div class="hn--container hn--jobs-container">
+            <span class="hn--jobs-title">
+                <a target="_blank" href="<?= $job->{"url"} ?>">
+                    <?= $job->{"title"} ?>
+                </a>
+            </span>
+            <br />
+            <div class="hn--jobs-author">
+                <span >
+                    Author
+                </span>
+                <span>
+                    <?= $job->{"by"} ?>
+                </span>
+            </div>
+        </div>
+    <?php endfor ?>
+    <hr />
+    <p>Latest News</p>
     <?php for ($i = $from; $i < count($top_stories) && $i < $to; $i++) : ?>
         <?php
             if ((isset($_CONFIG["USE_MEMCACHED"]) && $_CONFIG["USE_MEMCACHED"]) && $memcached->get("news-$top_stories[$i]")) {
@@ -48,34 +87,37 @@
                 }
             }
         ?>
-        <div class="hn--news-containter">
+        <div class="hn--container hn--news-container">
             <span class="hn--news-title">
                 <a target="_blank" href="<?= $story->{"url"} ?>">
                     <?= $story->{"title"} ?>
                 </a>
             </span>
             <br />
-            <span class="hn--news-comments">
-                <a href="/comments?id=<?= $story->{"id"} ?>">
-                    Comments
-                </a>
-            </span>
+            <div class="hn--news-author">
+                <span >
+                    Author
+                </span>
+                <span>
+                    <?= $story->{"by"} ?>
+                </span>
+            </div>
         </div>
     <?php endfor ?>
     <footer class="hn--footer-root">
+        <?php
+            $prev = $page - 1;
+            $next = $page + 1;
+
+            if ($prev <= 0) {
+                $prev = 1;
+            }
+        ?>
         <div class="hn--footer-left">
+            <a href="/?p=<?= $prev ?>">←</a>
         </div>
         <div class="hn--footer-right">
-            <?php
-                $prev = $page - 1;
-                $next = $page + 1;
-
-                if ($prev <= 0) {
-                    $prev = 1;
-                }
-            ?>
-            <a href="/?p=<?= $prev ?>">Prev</a>
-            <a href="/?p=<?= $next ?>">Next</a>
+            <a href="/?p=<?= $next ?>">→</a>
         </div>
     </footer>
 </body>
