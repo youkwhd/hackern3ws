@@ -11,9 +11,6 @@
 
     $curl = curl_init();
     curl_setopt($curl, CURLOPT_URL, "https://hacker-news.firebaseio.com/v0/topstories.json");
-    // REMOVE
-    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-    // REMOVE
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 
     $top_stories = json_decode(curl_exec($curl)) ?: [];
