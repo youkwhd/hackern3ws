@@ -4,7 +4,7 @@
     require_once "../cookie.php";
     require_once "../../config.php";
     
-    if (isset($_CONFIG["USE_MEMCACHED"]) && $_CONFIG["USE_MEMCACHED"]) {
+    if ($_CONFIG["MEMCACHED"]) {
         $memcached = new Memcached;
         $memcached->addServer("127.0.0.1", 11211);
     }
@@ -41,13 +41,13 @@
     <p>Latest Jobs</p>
     <?php for ($i = 0; $i < 3; $i++) : ?>
         <?php
-            if ((isset($_CONFIG["USE_MEMCACHED"]) && $_CONFIG["USE_MEMCACHED"]) && $memcached->get("jobs-$jobs[$i]")) {
+            if ($_CONFIG["MEMCACHED"] && $memcached->get("jobs-$jobs[$i]")) {
                 $job = $memcached->get("jobs-$jobs[$i]");
             } else {
                 curl_setopt($curl, CURLOPT_URL, "https://hacker-news.firebaseio.com/v0/item/$jobs[$i].json");
                 $job = json_decode(curl_exec($curl));
 
-                if (isset($_CONFIG["USE_MEMCACHED"]) && $_CONFIG["USE_MEMCACHED"]) {
+                if ($_CONFIG["MEMCACHED"]) {
                     $memcached->set("jobs-$jobs[$i]", $job);
                 }
             }
@@ -73,13 +73,13 @@
     <p>Latest News</p>
     <?php for ($i = $from; $i < count($top_stories) && $i < $to; $i++) : ?>
         <?php
-            if ((isset($_CONFIG["USE_MEMCACHED"]) && $_CONFIG["USE_MEMCACHED"]) && $memcached->get("news-$top_stories[$i]")) {
+            if ($_CONFIG["MEMCACHED"] && $memcached->get("news-$top_stories[$i]")) {
                 $story = $memcached->get("news-$top_stories[$i]");
             } else {
                 curl_setopt($curl, CURLOPT_URL, "https://hacker-news.firebaseio.com/v0/item/$top_stories[$i].json");
                 $story = json_decode(curl_exec($curl));
 
-                if (isset($_CONFIG["USE_MEMCACHED"]) && $_CONFIG["USE_MEMCACHED"]) {
+                if ($_CONFIG["MEMCACHED"]) {
                     $memcached->set("news-$top_stories[$i]", $story);
                 }
             }
