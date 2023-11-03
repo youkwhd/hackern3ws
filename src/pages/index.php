@@ -14,6 +14,7 @@
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 
     $top_stories = json_decode(curl_exec($curl)) ?: [];
+    $top_stories_len = count($top_stories);
 
     curl_setopt($curl, CURLOPT_URL, "https://hacker-news.firebaseio.com/v0/jobstories.json");
     $jobs = json_decode(curl_exec($curl)) ?: [];
@@ -71,7 +72,7 @@
     <?php endfor ?>
     <hr />
     <p>Latest News</p>
-    <?php for ($i = $from; $i < count($top_stories) && $i < $to; $i++) : ?>
+    <?php for ($i = $from; $i < $top_stories_len && $i < $to; $i++) : ?>
         <?php
             if ($_CONFIG["MEMCACHED"] && $memcached->get("news-$top_stories[$i]")) {
                 $story = $memcached->get("news-$top_stories[$i]");
@@ -106,8 +107,14 @@
             $prev = $page - 1;
             $next = $page + 1;
 
+            $max_page = $top_stories_len / $_COOKIE["NEWS_PER_PAGE"];
+
             if ($prev <= 0) {
-                $prev = 1;
+                $prev = $max_page;
+            }
+
+            if ($next > $max_page) {
+                $next = 1;
             }
         ?>
         <div class="hn--footer-left">
