@@ -65,7 +65,7 @@
                 $job = json_decode(curl_exec($curl));
 
                 if ($_CONFIG["MEMCACHED"]) {
-                    $memcached->set("jobs-$jobs[$i]", $job, 60 * 8);
+                    $memcached->set("jobs-$jobs[$i]", $job);
                 }
             }
         ?>
@@ -97,7 +97,7 @@
                 $story = json_decode(curl_exec($curl));
 
                 if ($_CONFIG["MEMCACHED"]) {
-                    $memcached->set("news-$top_stories[$i]", $story, 60 * 8);
+                    $memcached->set("news-$top_stories[$i]", $story);
                 }
             }
         ?>
