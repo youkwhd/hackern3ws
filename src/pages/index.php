@@ -3,22 +3,34 @@
     require_once "../path.php";
     require_once "../cookie.php";
     require_once "../../config.php";
-    
+
     if ($_CONFIG["MEMCACHED"]) {
         $memcached = new Memcached;
         $memcached->addServer("127.0.0.1", 11211);
     }
 
     $curl = curl_init();
-    curl_setopt($curl, CURLOPT_URL, "https://hacker-news.firebaseio.com/v0/topstories.json");
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 
-    $top_stories = json_decode(curl_exec($curl)) ?: [];
+    if ($_CONFIG["MEMCACHED"] && $memcached->get("global-topst")) {
+        $top_stories = $memcached->get("global-topst");
+    } else {
+        curl_setopt($curl, CURLOPT_URL, "https://hacker-news.firebaseio.com/v0/topstories.json");
+        $top_stories = json_decode(curl_exec($curl)) ?: [];
+        // cache for 2 minutes
+        $memcached->set("global-topst", $top_stories, 60 * 2);
+    }
+
+    if ($_CONFIG["MEMCACHED"] && $memcached->get("global-topjob")) {
+        $jobs = $memcached->get("global-topjob"); 
+    } else {
+        curl_setopt($curl, CURLOPT_URL, "https://hacker-news.firebaseio.com/v0/jobstories.json");
+        $jobs = json_decode(curl_exec($curl)) ?: [];
+        // cache for 2 minutes 
+        $memcached->set("global-topjob", $jobs, 60 * 2);
+    }
+
     $top_stories_len = count($top_stories);
-
-    curl_setopt($curl, CURLOPT_URL, "https://hacker-news.firebaseio.com/v0/jobstories.json");
-    $jobs = json_decode(curl_exec($curl)) ?: [];
-
     $page = isset($_GET["p"]) && $_GET["p"] > 0 ? $_GET["p"] : 1;
     $to = $_COOKIE["NEWS_PER_PAGE"] * $page;
     $from = $to - $_COOKIE["NEWS_PER_PAGE"];
@@ -107,9 +119,9 @@
             $prev = $page - 1;
             $next = $page + 1;
 
-            $max_page = $top_stories_len / $_COOKIE["NEWS_PER_PAGE"];
+            $max_page = (int)($top_stories_len / $_COOKIE["NEWS_PER_PAGE"]);
 
-            if ($prev <= 0) {
+            if ($prev <= 0 || $prev > $max_page) {
                 $prev = $max_page;
             }
 

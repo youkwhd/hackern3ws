@@ -19,6 +19,7 @@ body {
 .hn--footer-root a {
     color: white;
     text-decoration: none;
+    font-size: 24px;
 }
 
 h1 {
