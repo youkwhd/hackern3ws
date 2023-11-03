@@ -36,8 +36,8 @@
 
     $top_stories_len = count($top_stories);
     $page = isset($_GET["p"]) && $_GET["p"] > 0 ? $_GET["p"] : 1;
-    $to = $_COOKIE["NEWS_PER_PAGE"] * $page;
-    $from = $to - $_COOKIE["NEWS_PER_PAGE"];
+    $to = $_CONFIG["NEWS_PER_PAGE"] * $page;
+    $from = $to - $_CONFIG["NEWS_PER_PAGE"];
 ?>
     
 
@@ -123,7 +123,7 @@
             $prev = $page - 1;
             $next = $page + 1;
 
-            $max_page = (int)($top_stories_len / $_COOKIE["NEWS_PER_PAGE"]);
+            $max_page = (int)($top_stories_len / $_CONFIG["NEWS_PER_PAGE"]);
 
             if ($prev <= 0 || $prev > $max_page) {
                 $prev = $max_page;
