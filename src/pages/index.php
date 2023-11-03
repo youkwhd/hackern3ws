@@ -17,8 +17,10 @@
     } else {
         curl_setopt($curl, CURLOPT_URL, "https://hacker-news.firebaseio.com/v0/topstories.json");
         $top_stories = json_decode(curl_exec($curl)) ?: [];
-        // cache for 2 minutes
-        $memcached->set("global-topst", $top_stories, 60 * 2);
+        if ($_CONFIG["MEMCACHED"]) {
+            // cache for 2 minutes
+            $memcached->set("global-topst", $top_stories, 60 * 2);
+        }
     }
 
     if ($_CONFIG["MEMCACHED"] && $memcached->get("global-topjob")) {
@@ -26,8 +28,10 @@
     } else {
         curl_setopt($curl, CURLOPT_URL, "https://hacker-news.firebaseio.com/v0/jobstories.json");
         $jobs = json_decode(curl_exec($curl)) ?: [];
-        // cache for 2 minutes 
-        $memcached->set("global-topjob", $jobs, 60 * 2);
+        if ($_CONFIG["MEMCACHED"]) {
+            // cache for 2 minutes 
+            $memcached->set("global-topjob", $jobs, 60 * 2);
+        }
     }
 
     $top_stories_len = count($top_stories);
@@ -61,7 +65,7 @@
                 $job = json_decode(curl_exec($curl));
 
                 if ($_CONFIG["MEMCACHED"]) {
-                    $memcached->set("jobs-$jobs[$i]", $job);
+                    $memcached->set("jobs-$jobs[$i]", $job, 60 * 8);
                 }
             }
         ?>
@@ -93,7 +97,7 @@
                 $story = json_decode(curl_exec($curl));
 
                 if ($_CONFIG["MEMCACHED"]) {
-                    $memcached->set("news-$top_stories[$i]", $story);
+                    $memcached->set("news-$top_stories[$i]", $story, 60 * 8);
                 }
             }
         ?>
