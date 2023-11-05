@@ -16,6 +16,7 @@
     } else {
         curl_setopt($curl, CURLOPT_URL, "https://hacker-news.firebaseio.com/v0/topstories.json");
         $top_stories = json_decode(curl_exec($curl)) ?: [];
+
         if ($_CONFIG["MEMCACHED"]) {
             // cache for 2 minutes
             $memcached->set("global-topst", $top_stories, 60 * 2);
@@ -27,6 +28,7 @@
     } else {
         curl_setopt($curl, CURLOPT_URL, "https://hacker-news.firebaseio.com/v0/jobstories.json");
         $jobs = json_decode(curl_exec($curl)) ?: [];
+
         if ($_CONFIG["MEMCACHED"]) {
             // cache for 2 minutes 
             $memcached->set("global-topjob", $jobs, 60 * 2);
@@ -50,11 +52,23 @@
 </head>
 <body>
     <header>
-        <h1>
-            hackern3ws
-        </h1>
+        <h1 class="hn--header-title">hackern3ws</h1>
+        <nav>
+            <ul>
+                <li>
+                    <a href="/news">
+                        NEWS
+                    </a>
+                </li>
+                <li>
+                    <a href="/jobs">
+                        JOBS
+                    </a>
+                </li>
+            </ul>
+        </nav>
     </header>
-    <p>Latest Jobs</p>
+    <h2 class="hn--lt-title">Latest Jobs</h2>
     <?php for ($i = 0; $i < 3; $i++) : ?>
         <?php
             if ($_CONFIG["MEMCACHED"] && $memcached->get("jobs-$jobs[$i]")) {
@@ -75,18 +89,15 @@
                 </a>
             </span>
             <br />
-            <div class="hn--jobs-author">
-                <span >
-                    Author
-                </span>
-                <span>
+            <div class="hn--news-bottom">
+                <small>
                     <?= $job->{"by"} ?>
-                </span>
+                </small>
             </div>
         </div>
     <?php endfor ?>
     <hr />
-    <p>Latest News</p>
+    <h2 class="hn--tn-title">Top News</h2>
     <?php for ($i = $from; $i < $top_stories_len && $i < $to; $i++) : ?>
         <?php
             if ($_CONFIG["MEMCACHED"] && $memcached->get("news-$top_stories[$i]")) {
@@ -101,19 +112,18 @@
             }
         ?>
         <div class="hn--container hn--news-container">
-            <span class="hn--news-title">
-                <a target="_blank" href="<?= $story->{"url"} ?>">
-                    <?= $story->{"title"} ?>
-                </a>
-            </span>
-            <br />
-            <div class="hn--news-author">
-                <span >
-                    Author
+            <div>
+                <span class="hn--news-title">
+                    <a target="_blank" href="<?= $story->{"url"} ?>">
+                        <?= $story->{"title"} ?>
+                    </a>
                 </span>
-                <span>
-                    <?= $story->{"by"} ?>
-                </span>
+                <br />
+                <div class="hn--news-bottom">
+                    <small>
+                        <?= $story->{"by"} ?>
+                    </small>
+                </div>
             </div>
         </div>
     <?php endfor ?>

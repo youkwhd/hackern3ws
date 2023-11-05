@@ -1,11 +1,16 @@
 html, body {
-    background-color: black;
-    color: white;
+    /* background-color: black; */
+    /* color: white; */
 }
 
 body {
     max-width: 720px;
     margin: 10px auto;
+}
+
+a {
+    color: black;
+    text-decoration: none;
 }
 
 .hn--footer-root {
@@ -17,7 +22,6 @@ body {
 }
 
 .hn--footer-root a {
-    color: white;
     text-decoration: none;
     font-size: 24px;
 }
@@ -30,10 +34,44 @@ h2 {
     font-size: 22px;
 }
 
+.hn--header-title {
+    font-size: 25px;
+    text-align: center;
+}
+
+nav ul {
+    li {
+        list-style: none;
+        margin: 0px 5px;
+    }
+
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .hn--news-title {
     /* font-size: 14px; */
 }
 
 .hn--container {
     margin: 10px 0px;
+}
+
+.hn--news-container {
+    display: flex;
+    
+    /* :first-child { */
+    /*     margin-right: 5px; */
+    /* } */
+}
+
+.hn--lt-title {
+    font-size: 20px;
+}
+
+.hn--tn-title {
+    color: red;
 }
