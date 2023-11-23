@@ -1,5 +1,6 @@
 <?php
     require_once "../css.php";
+    require_once "../components/header.php";
 ?>
 
 <!DOCTYPE html>
@@ -11,17 +12,7 @@
     <title>Hacker N3ws</title>
 </head>
 <body>
-    <header>
-        <h1>
-            hackern3ws
-        </h1>
-    </header>
-    NOT FOUND
-    <footer class="hn--footer-root">
-        <div class="hn--footer-left">
-        </div>
-        <div class="hn--footer-right">
-        </div>
-    </footer>
+    <?= render_header() ?>
+    Page does not exists
 </body>
 </html>
