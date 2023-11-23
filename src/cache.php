@@ -7,9 +7,9 @@ function get_from_inet_or_cache($curl, $memcached, $cache_key, $url_endpoint) {
     curl_setopt($curl, CURLOPT_URL, $url_endpoint);
     $obj = json_decode(curl_exec($curl)) ?: [];
 
-    // cache for 2 minutes
+    // cache for 5 minutes
     if ($memcached)
-        $memcached->set($cache_key, $obj, time() + 60 * 2);
+        $memcached->set($cache_key, $obj, time() + 60 * 5);
 
     return $obj;
 }
