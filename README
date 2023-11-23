@@ -15,7 +15,8 @@ Configuration
 Every configuration should be tied to the file config.php
 
 Memcached is enabled by default, set MEMCACHED to false to
-disable.
+disable, although it is optional for memcached to be used, know
+that it would make the application painfully slow without it.
 
 Powering up server
 ------------------
