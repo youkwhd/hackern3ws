@@ -2,4 +2,4 @@
 
 $_CONFIG = [];
 $_CONFIG["MEMCACHED"] = true;
-$_CONFIG["NEWS_PER_PAGE"] = 10;
+$_CONFIG["NEWS_PER_PAGE"] = 15;
