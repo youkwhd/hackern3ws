@@ -1,6 +1,7 @@
 <?php
     require_once "../css.php";
     require_once "../path.php";
+    require_once "../cache.php";
     require_once "../../config.php";
 
     if ($_CONFIG["MEMCACHED"]) {
@@ -11,29 +12,8 @@
     $curl = curl_init();
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 
-    if ($_CONFIG["MEMCACHED"] && $memcached->get("global-topst")) {
-        $top_stories = $memcached->get("global-topst");
-    } else {
-        curl_setopt($curl, CURLOPT_URL, "https://hacker-news.firebaseio.com/v0/topstories.json");
-        $top_stories = json_decode(curl_exec($curl)) ?: [];
-
-        if ($_CONFIG["MEMCACHED"]) {
-            // cache for 2 minutes
-            $memcached->set("global-topst", $top_stories, 60 * 2);
-        }
-    }
-
-    if ($_CONFIG["MEMCACHED"] && $memcached->get("global-topjob")) {
-        $jobs = $memcached->get("global-topjob"); 
-    } else {
-        curl_setopt($curl, CURLOPT_URL, "https://hacker-news.firebaseio.com/v0/jobstories.json");
-        $jobs = json_decode(curl_exec($curl)) ?: [];
-
-        if ($_CONFIG["MEMCACHED"]) {
-            // cache for 2 minutes 
-            $memcached->set("global-topjob", $jobs, 60 * 2);
-        }
-    }
+    $top_stories = get_from_inet_or_cache($curl, $memcached, "global-topst", "https://hacker-news.firebaseio.com/v0/topstories.json");
+    $jobs = get_from_inet_or_cache($curl, $memcached, "global-topjob", "https://hacker-news.firebaseio.com/v0/jobstories.json");
 
     $top_stories_len = count($top_stories);
     $page = isset($_GET["p"]) && $_GET["p"] > 0 ? $_GET["p"] : 1;
@@ -71,16 +51,7 @@
     <h2 class="hn--lt-title">Latest Jobs</h2>
     <?php for ($i = 0; $i < 3; $i++) : ?>
         <?php
-            if ($_CONFIG["MEMCACHED"] && $memcached->get("jobs-$jobs[$i]")) {
-                $job = $memcached->get("jobs-$jobs[$i]");
-            } else {
-                curl_setopt($curl, CURLOPT_URL, "https://hacker-news.firebaseio.com/v0/item/$jobs[$i].json");
-                $job = json_decode(curl_exec($curl));
-
-                if ($_CONFIG["MEMCACHED"]) {
-                    $memcached->set("jobs-$jobs[$i]", $job);
-                }
-            }
+            $job = get_from_inet_or_cache($curl, $memcached, "jobs-$jobs[$i]", "https://hacker-news.firebaseio.com/v0/item/$jobs[$i].json");
         ?>
         <div class="hn--container hn--jobs-container">
             <span class="hn--jobs-title">
@@ -100,16 +71,7 @@
     <h2 class="hn--tn-title">Top News</h2>
     <?php for ($i = $from; $i < $top_stories_len && $i < $to; $i++) : ?>
         <?php
-            if ($_CONFIG["MEMCACHED"] && $memcached->get("news-$top_stories[$i]")) {
-                $story = $memcached->get("news-$top_stories[$i]");
-            } else {
-                curl_setopt($curl, CURLOPT_URL, "https://hacker-news.firebaseio.com/v0/item/$top_stories[$i].json");
-                $story = json_decode(curl_exec($curl));
-
-                if ($_CONFIG["MEMCACHED"]) {
-                    $memcached->set("news-$top_stories[$i]", $story);
-                }
-            }
+            $story = get_from_inet_or_cache($curl, $memcached, "news-$top_stories[$i]", "https://hacker-news.firebaseio.com/v0/item/$top_stories[$i].json");
         ?>
         <div class="hn--container hn--news-container">
             <div>
@@ -121,6 +83,7 @@
                 <br />
                 <div class="hn--news-bottom">
                     <small>
+                        <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 20 20" aria-hidden="true" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M10 8a3 3 0 100-6 3 3 0 000 6zM3.465 14.493a1.23 1.23 0 00.41 1.412A9.957 9.957 0 0010 18c2.31 0 4.438-.784 6.131-2.1.43-.333.604-.903.408-1.41a7.002 7.002 0 00-13.074.003z"></path></svg>
                         <?= $story->{"by"} ?>
                     </small>
                 </div>
