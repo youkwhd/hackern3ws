@@ -24,7 +24,6 @@
     $from = $to - $_CONFIG["NEWS_PER_PAGE"];
 ?>
     
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -50,7 +49,7 @@
                 <div>
                     <span class="hn--news-title">
                         <a target="_blank" href="<?= $story->{"url"} ?>">
-                            <?= $story->{"title"} ?>
+                            <?= htmlspecialchars($story->{"title"}) ?>
                         </a>
                     </span>
                     <br />
