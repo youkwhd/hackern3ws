@@ -24,3 +24,8 @@ Powering up server
 I use PHP's built-in server:
 
     ./serve.sh -h
+
+TODOs
+-----
+
+Add `pthread` or `parallel` for better performance.
